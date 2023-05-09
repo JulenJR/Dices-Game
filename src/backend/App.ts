@@ -1,4 +1,6 @@
 import { Server } from "./Server";
+import { Request, Response } from "express";
+import jwt from 'jsonwebtoken';
 
 export class App {
 	server?: Server;
@@ -10,3 +12,5 @@ export class App {
 		await this.server.listen();
 	}
 }
+
+
