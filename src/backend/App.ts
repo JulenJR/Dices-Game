@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import { json } from "body-parser";
 import jwt from "jsonwebtoken";
 import { Server } from "./Server";
+import mongoose from 'mongoose';
 
 const secretKey = "my_secret_key";
 
