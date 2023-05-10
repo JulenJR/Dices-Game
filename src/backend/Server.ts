@@ -4,8 +4,8 @@ import express from "express";
 import helmet from "helmet";
 
 export class Server {
-	private readonly express: express.Express;
-	private readonly port: string;
+	public readonly express: express.Express;
+	public readonly port: string;
 
 	constructor(port: string) {
 		this.port = port;
