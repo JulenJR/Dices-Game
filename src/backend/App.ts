@@ -18,16 +18,33 @@ const secretKey = 'my_secret_key';
 
 interface Player {
 	id : string;
+	password : string;
 }
 
 let players : Player[];
 
 app.use(express.json());
 
+
+//POST /login: authenticate if the data provided by user are correct
+app.post('/login', (req: Request, res : Response) => {
+
+	const { id, password } = req.body;
+
+	const user = players.find((user) => user.id === id);
+	if(!user || password !== user.password ){
+		return res.status(401).json({ error : 'The username or password are incorrect' });
+	}
+
+	const token = jwt.sign({id : user.id}, secretKey);
+
+	res.json({token});
+});
+
 //POST /player: create a new player if the name doesnt exist jet
 app.post('/player', (req : Request, res : Response) => {
 	
-	let { id } = req.body;
+	let { id, password } = req.body;
 
 	if (!id) id = 'anonymous'
 
@@ -35,7 +52,7 @@ app.post('/player', (req : Request, res : Response) => {
 		return res.status(400).json({ error: 'Player name already exist' });
 	}
 
-	const player : Player = { id };
+	const player : Player = { id, password };
 	players.push(player);
 
 	const jwtoken = jwt.sign({ id }, secretKey);
@@ -54,7 +71,7 @@ app.put('/player/:id', (req : Request, res : Response) => {
   }
 
   if (players.find((player) => player.id === newId)){
-	return res.status(400).json({ error: 'This name already' })
+	return res.status(400).json({ error: 'This name already exist' })
   }
 
   players[playerIndex].id = newId;
