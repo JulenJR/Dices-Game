@@ -139,17 +139,24 @@ export class App {
 
 		await this.server.listen();
 	}
+
 }
 
-try {
-	void new App().start();
-} catch (e) {
-	process.exit(1);
-}
 
-process.on("uncaughtException", () => {
-	process.exit(1);
-});
+app.listen(8000, () => {
+	console.log(`Server is running on http://localhost:8000`);
+  });
+
+
+// try {
+// 	void new App().start();
+// } catch (e) {
+// 	process.exit(1);
+// }
+
+// process.on("uncaughtException", () => {
+// 	process.exit(1);
+// });
 
 // Connect to the database
 mongoose.connect('mongodb+srv://dbuser:dbuserpp@atlascluster.ccvayit.mongodb.net/', {
