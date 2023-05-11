@@ -97,4 +97,14 @@ const options: ConnectOptions = {
 };
 
 // Connect to the database
-mongoose.connect('mongodb+srv://dbuser:dbUserPss@atlascluster.ccvayit.mongodb.net/', options);
+mongoose.connect('mongodb+srv://dbuser:dbuserpp@atlascluster.ccvayit.mongodb.net/', {
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+  } as ConnectOptions)
+  .then(() => {
+	console.log("Database connected");
+  })
+  .catch((error) => {
+	console.error("db error", error);
+	process.exit(1);
+  });
