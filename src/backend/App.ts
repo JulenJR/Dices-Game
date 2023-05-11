@@ -105,14 +105,17 @@ app.post('/games/:id', async (req: Request, res: Response) => {
 		return res.status(404).json({ error: 'Player not found' });
 	}
 
-	const result = Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6) + 2;
+	const dice1 = Math.floor(Math.random() * 6);
+	const dice2 = Math.floor(Math.random() * 6);
+
+	const result = dice1 + dice2;
 	const round: GameRound = { player: playerId, result };
 	await GameModel.updateOne({ player: playerId }, { $push: { rounds: round } }, { upsert: true });
 
 	if (result === 7) {
-		res.json({ message: 'You won!' });
+		res.json({ message: `${dice1} + ${dice2} = ${result}: You won the game!` });
 	} else {
-		res.json({ message: 'Better luck next time!' });
+		res.json({ message: `${dice1} + ${dice2} = ${result}: Better luck next time :c` });
 	}
 });
 
