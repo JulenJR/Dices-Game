@@ -8,12 +8,36 @@ interface Player {
 	password : string;
 }
 
+interface Game {
+	player : string;
+	rounds : GameRound[];
+}
+
+interface GameRound {
+	player : string;
+	result : number;
+}
+
 const playerSchema = new Schema({
 	id: { type: String, required: true },
 	password: { type: String, required: true }
 });
 
+//to access player db
 const PlayerModel = mongoose.model<Player>('Player', playerSchema);
+
+const gameRoundSchema = new Schema<GameRound>({
+	player: { type: String, required: true },
+	result: { type: Number, required: true }
+});
+
+const gameSchema = new Schema<Game>({
+	player: { type: String, required: true },
+	rounds: [gameRoundSchema]
+});
+
+const GameModel = mongoose.model<Game>('Game', gameSchema);
+
 
 const app = express();
 const secretKey = 'my_secret_key';
@@ -72,6 +96,38 @@ app.put('/player/:id', async (req : Request, res : Response) => {
 	res.json({ player, jwtoken });
 });
 
+// POST /games/:id: play a round of dice for the given player ID
+app.post('/games/:id', async (req: Request, res: Response) => {
+	const playerId = req.params.id;
+
+	const user = await PlayerModel.findById(playerId);
+	if (!user) {
+		return res.status(404).json({ error: 'Player not found' });
+	}
+
+	const result = Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6) + 2;
+	const round: GameRound = { player: playerId, result };
+	await GameModel.updateOne({ player: playerId }, { $push: { rounds: round } }, { upsert: true });
+
+	if (result === 7) {
+		res.json({ message: 'You won!' });
+	} else {
+		res.json({ message: 'Better luck next time!' });
+	}
+});
+
+// GET /games/:id: get all rounds played by the given player ID
+app.get('/games/:id', async (req: Request, res: Response) => {
+	const playerId = req.params.id;
+
+	const rounds = await GameModel.findOne({ player: playerId }).select('rounds');
+	if (!rounds) {
+		return res.status(404).json({ error: 'Player not found' });
+	}
+
+	res.json({ rounds });
+});
+
 export class App {
 	server?: Server;
 
@@ -93,9 +149,6 @@ process.on("uncaughtException", () => {
 	process.exit(1);
 });
 
-const options: ConnectOptions = {
-};
-
 // Connect to the database
 mongoose.connect('mongodb+srv://dbuser:dbuserpp@atlascluster.ccvayit.mongodb.net/', {
 	useNewUrlParser: true,
@@ -105,6 +158,6 @@ mongoose.connect('mongodb+srv://dbuser:dbuserpp@atlascluster.ccvayit.mongodb.net
 	console.log("Database connected");
   })
   .catch((error) => {
-	console.error("db error", error);
+	console.error("ERROR on db: ", error);
 	process.exit(1);
   });
