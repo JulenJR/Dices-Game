@@ -144,7 +144,9 @@ export class App {
 
 
 app.listen(8000, () => {
-	console.log(`Server is running on http://localhost:8000`);
+	console.log(
+		`✅ Backend App is running at http://localhost:8000 in development mode
+✋ Press CTRL-C to stop`);
   });
 
 
