@@ -144,6 +144,40 @@ app.delete('/games/:id', async (req: Request, res: Response) => {
   
 	res.json({ message: 'Games deleted successfully' });
   });
+
+  app.get('/ranking', async (req: Request, res: Response) => {
+	try {
+	  const players = await PlayerModel.find();
+  
+	  const winRates = await Promise.all(
+		players.map(async (player) => {
+		  const games = await GameModel.find({ player: player.id });
+  
+		  let wins = 0;
+		  let totalRounds = 0;
+  
+		  games.forEach((game) => {
+			game.rounds.forEach((round) => {
+			  totalRounds++;
+			  if (round.result === 7) {
+				wins++;
+			  }
+			});
+		  });
+		  const winRate = (wins / totalRounds) * 100;
+  
+		  return { player: player.id, winRate };
+		})
+	  );
+	  const sortedPlayers = winRates.sort((a, b) => b.winRate - a.winRate);
+  
+	  res.json(sortedPlayers);
+	} catch (err) {
+	  res.status(500).json({ err: 'Failed to retrieve ranking' });
+	}
+  });
+  
+  
   
 
 export class App {
@@ -165,16 +199,6 @@ app.listen(8000, () => {
 ✋ Press CTRL-C to stop`);
   });
 
-
-// try {
-// 	void new App().start();
-// } catch (e) {
-// 	process.exit(1);
-// }
-
-// process.on("uncaughtException", () => {
-// 	process.exit(1);
-// });
 
 // Connect to the database
 mongoose.connect('mongodb+srv://dbuser:dbuserpp@atlascluster.ccvayit.mongodb.net/', {
