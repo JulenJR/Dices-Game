@@ -131,6 +131,21 @@ app.get('/games/:id', async (req: Request, res: Response) => {
 	res.json({ rounds });
 });
 
+//DELETE /games/:id: delete all the games of the given player ID
+app.delete('/games/:id', async (req: Request, res: Response) => {
+	const player = req.params.id;
+  
+	const user = await PlayerModel.findOne({ id: player });
+	if (!user) {
+	  return res.status(404).json({ error: 'Player not found' });
+	}
+  
+	await GameModel.deleteMany({ player: player });
+  
+	res.json({ message: 'Games deleted successfully' });
+  });
+  
+
 export class App {
 	server?: Server;
 
