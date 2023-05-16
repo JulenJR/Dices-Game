@@ -75,25 +75,26 @@ app.post('/player', async (req : Request, res : Response) => {
 });
 
 //PUT /players/{id}: change the name of the player for another that deosnt exist jet
-app.put('/player/:id', async (req : Request, res : Response) => {
+app.put('/player/:id', async (req: Request, res: Response) => {
 	const playerId = req.params.id;
 	const { newId } = req.body;
-
-	const player = await PlayerModel.findOne({ 'id': playerId });
+  
+	const player = await PlayerModel.findOne({ id: playerId });
 	if (!player) {
-		return res.status(404).json({ error: 'Player not found' });
+	  return res.status(404).json({ error: 'Player not found' });
 	}
-
+  
 	if (await PlayerModel.exists({ id: newId })) {
-		return res.status(400).json({ error: 'This name already exists' });
+	  return res.status(400).json({ error: 'This name already exists' });
 	}
-
+  
 	player.id = newId;
 	await player.save();
-
+  
 	const jwtoken = jwt.sign({ id: playerId, newId }, secretKey);
 	res.json({ player, jwtoken });
-});
+  });
+  
 
 // POST /games/:id: play a round of dice for the given player ID
 app.post('/games/:id', async (req: Request, res: Response) => {
