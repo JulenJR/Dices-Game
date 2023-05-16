@@ -122,7 +122,7 @@ app.post('/games/:id', async (req: Request, res: Response) => {
 app.get('/games/:id', async (req: Request, res: Response) => {
 	const playerId = req.params.id;
 
-	const rounds = await GameModel.findOne({ player: playerId }).select('rounds');
+	const rounds = await GameModel.findOne({ player : playerId }).select('rounds');
 	if (!rounds) {
 		return res.status(404).json({ error: 'Player not found' });
 	}
