@@ -102,6 +102,7 @@ app.get('/players', async (req : Request, res : Response) => {
 	
 		res.json(winRates);
 	  } catch (err) {
+		console.error(err);
 		res.status(500).json({ err: 'Failed to retrieve players' });
 	  }
 });
@@ -205,6 +206,7 @@ app.delete('/games/:id', async (req: Request, res: Response) => {
   
 	  res.json(sortedPlayers);
 	} catch (err) {
+		console.error(err);
 	  res.status(500).json({ err: 'Failed to retrieve ranking' });
 	}
   });
@@ -239,6 +241,7 @@ app.delete('/games/:id', async (req: Request, res: Response) => {
 	
 		res.json(winner);
 	  } catch (err) {
+		console.error(err);
 		res.status(500).json({ err: 'Failed to retrieve ranking' });
 	  }
   });
