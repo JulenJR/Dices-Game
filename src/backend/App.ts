@@ -74,6 +74,38 @@ app.post('/player', async (req : Request, res : Response) => {
 	res.json({ player, jwtoken });
 });
 
+//GET /players: shows all the players with them winrates
+app.get('/players', async (req : Request, res : Response) => {
+	try {
+		const players = await PlayerModel.find();
+	
+		const winRates = await Promise.all(
+		  players.map(async (player) => {
+			const games = await GameModel.find({ player: player.id });
+	
+			let wins = 0;
+			let totalRounds = 0;
+	
+			games.forEach((game) => {
+			  game.rounds.forEach((round) => {
+				totalRounds++;
+				if (round.result === 7) {
+				  wins++;
+				}
+			  });
+			});
+			const winRate = (wins / totalRounds) * 100;
+	
+			return { player: player.id, winRate };
+		  })
+		);
+	
+		res.json(winRates);
+	  } catch (err) {
+		res.status(500).json({ err: 'Failed to retrieve players' });
+	  }
+});
+
 //PUT /players/{id}: change the name of the player for another that deosnt exist jet
 app.put('/player/:id', async (req: Request, res: Response) => {
 	const playerId = req.params.id;
@@ -174,6 +206,77 @@ app.delete('/games/:id', async (req: Request, res: Response) => {
 	  res.json(sortedPlayers);
 	} catch (err) {
 	  res.status(500).json({ err: 'Failed to retrieve ranking' });
+	}
+  });
+
+  //GET /ranking/loser: shows the player with the best winrate
+  app.get('/ranking/winner', async (req : Request, res : Response) => {
+	try {
+		const players = await PlayerModel.find();
+	
+		const winRates = await Promise.all(
+		  players.map(async (player) => {
+			const games = await GameModel.find({ player: player.id });
+	
+			let wins = 0;
+			let totalRounds = 0;
+	
+			games.forEach((game) => {
+			  game.rounds.forEach((round) => {
+				totalRounds++;
+				if (round.result === 7) {
+				  wins++;
+				}
+			  });
+			});
+			const winRate = (wins / totalRounds) * 100;
+	
+			return { player: player.id, winRate };
+		  })
+		);
+		const sortedPlayers = winRates.sort((a, b) => b.winRate - a.winRate);
+		const winner = sortedPlayers[0];
+	
+		res.json(winner);
+	  } catch (err) {
+		res.status(500).json({ err: 'Failed to retrieve ranking' });
+	  }
+  });
+  
+  //GET /ranking/loser: shows the player with the worst winrate
+  app.get('/ranking/loser', async (req: Request, res: Response) => {
+	try {
+	  const players = await PlayerModel.find();
+  
+	  const winRates = await Promise.all(
+		players.map(async (player) => {
+		  const games = await GameModel.find({ player: player.id });
+  
+		  let wins = 0;
+		  let totalRounds = 0;
+  
+		  games.forEach((game) => {
+			game.rounds.forEach((round) => {
+			  totalRounds++;
+			  if (round.result === 7) {
+				wins++;
+			  }
+			});
+		  });
+  
+		  const winRate = (wins / totalRounds) * 100;
+  
+		  return { player: player.id, winRate };
+		})
+	  );
+  
+	  const sortedPlayers = winRates.sort((a, b) => b.winRate - a.winRate);
+  
+	  const worstPlayer = sortedPlayers[sortedPlayers.length - 1];
+  
+	  res.json(worstPlayer);
+	} catch (err) {
+	  res.status(500).json({ error: 'Failed to retrieve loser ranking' });
 	}
   });
   
