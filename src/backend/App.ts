@@ -63,7 +63,7 @@ app.post('/player', async (req : Request, res : Response) => {
 
 	if (!id) id = 'anonymous';
 
-	if (await PlayerModel.exists({ id })) {
+	if (await PlayerModel.exists({ id }) && id != 'anonymous') {
 		return res.status(400).json({ error: 'Player name already exist' });
 	}
 
@@ -79,13 +79,13 @@ app.put('/player/:id', async (req : Request, res : Response) => {
 	const playerId = req.params.id;
 	const { newId } = req.body;
 
-	const player = await PlayerModel.findOne({ id: playerId });
+	const player = await PlayerModel.findOne({ 'id': playerId });
 	if (!player) {
 		return res.status(404).json({ error: 'Player not found' });
 	}
 
 	if (await PlayerModel.exists({ id: newId })) {
-		return res.status(400).json({ error: 'This name already exists' })
+		return res.status(400).json({ error: 'This name already exists' });
 	}
 
 	player.id = newId;
@@ -99,7 +99,7 @@ app.put('/player/:id', async (req : Request, res : Response) => {
 app.post('/games/:id', async (req: Request, res: Response) => {
 	const playerId = req.params.id;
 
-	const user = await PlayerModel.findById(playerId);
+	const user = await PlayerModel.findOne({ 'id' : playerId });
 	if (!user) {
 		return res.status(404).json({ error: 'Player not found' });
 	}
