@@ -1,3 +1,5 @@
+/* eslint-disable*/
+
 import { Server } from "./Server";
 import express,{ Request, Response } from "express";
 import jwt from 'jsonwebtoken';
@@ -61,7 +63,7 @@ app.post('/login', async (req: Request, res : Response) => {
 app.post('/player', async (req : Request, res : Response) => {
 	let { id, password } = req.body;
 
-	if (!id) id = 'anonymous';
+	if (!id) {id = 'anonymous';}
 
 	if (await PlayerModel.exists({ id }) && id != 'anonymous') {
 		return res.status(400).json({ error: 'Player name already exist' });
