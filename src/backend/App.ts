@@ -1,5 +1,4 @@
 /* eslint-disable*/
-
 import { Server } from "./Server";
 import express,{ Request, Response } from "express";
 import jwt from 'jsonwebtoken';
@@ -9,7 +8,6 @@ interface Player {
 	id : string;
 	password : string;
 }
-
 interface Game {
 	player : string;
 	rounds : GameRound[];
